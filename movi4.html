@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOVI4 // Quote Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0D;
+    --panel:#141416;
+    --line:#26262A;
+    --gold:#C9A24B;
+    --teal:#1B6E6E;
+    --text:#EFEDE8;
+    --text-dim:#8B8A86;
+    --danger:#D9534F;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  body{
+    background-image:radial-gradient(circle at 50% 0%, rgba(201,162,75,0.05), transparent 55%);
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:44px 20px 70px;
+  }
+
+  /* ---------- HEADER ---------- */
+  .head{
+    text-align:center;
+    margin-bottom:34px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--teal);
+    margin-bottom:10px;
+  }
+  .title{
+    font-family:'Anton',sans-serif;
+    font-size:38px;
+    letter-spacing:2px;
+    color:var(--gold);
+    text-shadow:0 0 30px rgba(201,162,75,0.25);
+  }
+  .subtitle{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    color:var(--text-dim);
+    margin-top:6px;
+  }
+
+  /* ---------- FORM ---------- */
+  .form-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:24px;
+  }
+  label{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+  textarea{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:14px;
+    resize:vertical;
+    min-height:90px;
+    outline:none;
+    transition:border-color .2s;
+    line-height:1.5;
+  }
+  textarea:focus{ border-color:var(--gold); }
+  textarea::placeholder{ color:#54534E; }
+
+  .char-count{
+    text-align:right;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    margin-top:6px;
+  }
+
+  .generate-btn{
+    width:100%;
+    margin-top:16px;
+    background:var(--gold);
+    color:#1a1408;
+    border:none;
+    font-family:'Anton',sans-serif;
+    font-size:16px;
+    letter-spacing:2px;
+    padding:14px;
+    cursor:pointer;
+    transition:filter .15s, transform .15s;
+  }
+  .generate-btn:hover{ filter:brightness(1.1); }
+  .generate-btn:active{ transform:scale(.985); }
+  .generate-btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .status{
+    margin-top:12px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--text-dim);
+    text-align:center;
+    min-height:16px;
+  }
+  .status.error{ color:var(--danger); }
+
+  /* ---------- REEL / RESULT ---------- */
+  .reel{
+    margin-top:34px;
+    display:none;
+  }
+  .reel.active{ display:block; animation:reelin .5s ease; }
+  @keyframes reelin{
+    from{ opacity:0; transform:scale(.97); }
+    to{ opacity:1; transform:scale(1); }
+  }
+
+  .letterbox{
+    position:relative;
+    background:#000;
+    border:1px solid var(--line);
+  }
+  .letterbox .bar{
+    height:22px;
+    background:#000;
+    position:relative;
+    z-index:2;
+  }
+  .letterbox .bar::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 14px);
+  }
+  .frame{
+    position:relative;
+    overflow:hidden;
+    background:#000;
+    min-height:240px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .frame img{
+    width:100%;
+    display:block;
+    animation:flicker 0.18s steps(2) 3, fadeshow .6s ease;
+  }
+  @keyframes flicker{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.85; }
+  }
+  @keyframes fadeshow{
+    from{ opacity:0; }
+    to{ opacity:1; }
+  }
+  .frame .grain{
+    position:absolute; inset:0;
+    pointer-events:none;
+    opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay;
+  }
+  .frame .loading-spinner{
+    width:34px; height:34px;
+    border:2px solid var(--line);
+    border-top-color:var(--gold);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .frame .err-text{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--danger);
+    padding:20px;
+    text-align:center;
+  }
+
+  .credit-line{
+    margin-top:14px;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:1px;
+  }
+  .credit-line b{ color:var(--gold); }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    justify-content:center;
+  }
+  .actions a, .actions button{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    color:var(--text);
+    background:transparent;
+    border:1px solid var(--line);
+    padding:9px 16px;
+    cursor:pointer;
+    text-decoration:none;
+    transition:border-color .15s, color .15s;
+  }
+  .actions a:hover, .actions button:hover{
+    border-color:var(--gold);
+    color:var(--gold);
+  }
+
+  footer{
+    margin-top:40px;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:#4A4946;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="head">
+    <div class="eyebrow">QUOTE CARD GENERATOR</div>
+    <div class="title">MOVI4</div>
+    <div class="subtitle">Tulis kutipan, jadikan poster sinematik.</div>
+  </div>
+
+  <div class="form-box">
+    <label>// TULIS KUTIPAN</label>
+    <textarea id="quoteInput" placeholder="Jangan banyak kali bacot mu, sepakat?" maxlength="200"></textarea>
+    <div class="char-count"><span id="charCount">0</span> / 200</div>
+    <button class="generate-btn" id="genBtn">GENERATE</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="reel" id="reel">
+    <div class="letterbox">
+      <div class="bar"></div>
+      <div class="frame" id="frameInner"></div>
+      <div class="bar"></div>
+    </div>
+    <div class="credit-line">FAKE MOVI <b>V4</b> &middot; QUOTE: <span id="creditText"></span></div>
+    <div class="actions">
+      <a id="downloadLink" download="movi4-quote.png">UNDUH GAMBAR</a>
+      <button id="copyLinkBtn">SALIN LINK</button>
+    </div>
+  </div>
+
+  <footer>SUMBER: API.SYNOXCLOUD.XYZ/CANVAS/QUOTES-V5</footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const quoteInput = $('#quoteInput');
+const charCount = $('#charCount');
+const genBtn = $('#genBtn');
+const statusEl = $('#status');
+const reel = $('#reel');
+const frameInner = $('#frameInner');
+const creditText = $('#creditText');
+const downloadLink = $('#downloadLink');
+const copyLinkBtn = $('#copyLinkBtn');
+
+quoteInput.addEventListener('input', () => {
+  charCount.textContent = quoteInput.value.length;
+});
+
+function setStatus(msg, isError){
+  statusEl.textContent = msg || '';
+  statusEl.classList.toggle('error', !!isError);
+}
+
+function esc(v){
+  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function generate(){
+  const quote = quoteInput.value.trim();
+  if(!quote){
+    setStatus('Tulis kutipan dulu sebelum generate.', true);
+    return;
+  }
+
+  genBtn.disabled = true;
+  setStatus('Membuat poster...');
+  reel.classList.add('active');
+  frameInner.innerHTML = '<div class="loading-spinner"></div>';
+
+  const apiUrl = `https://api.synoxcloud.xyz/canvas/quotes-v5?text=${encodeURIComponent(quote)}`;
+
+  const img = new Image();
+  img.onload = () => {
+    frameInner.innerHTML = '';
+    img.alt = 'Movi4 quote card';
+    frameInner.appendChild(img);
+    const grain = document.createElement('div');
+    grain.className = 'grain';
+    frameInner.appendChild(grain);
+
+    creditText.textContent = quote.length > 60 ? quote.slice(0, 60) + '…' : quote;
+    downloadLink.href = apiUrl;
+    setStatus('Poster berhasil dibuat.');
+    genBtn.disabled = false;
+  };
+  img.onerror = () => {
+    frameInner.innerHTML = '<div class="err-text">❌ Gagal memuat gambar dari API. Coba lagi.</div>';
+    setStatus('Gagal membuat poster.', true);
+    genBtn.disabled = false;
+  };
+  img.src = apiUrl;
+}
+
+copyLinkBtn.addEventListener('click', async () => {
+  const quote = quoteInput.value.trim();
+  if(!quote) return;
+  const apiUrl = `https://api.synoxcloud.xyz/canvas/quotes-v5?text=${encodeURIComponent(quote)}`;
+  try{
+    await navigator.clipboard.writeText(apiUrl);
+    setStatus('Link gambar disalin ke clipboard.');
+  }catch(e){
+    setStatus('Tidak bisa menyalin otomatis, salin manual dari address bar gambar.', true);
+  }
+});
+
+genBtn.addEventListener('click', generate);
+quoteInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)) generate();
+});
+</script>
+
+</body>
+</html>
